@@ -7,6 +7,7 @@ import { Link, useLocation } from "react-router-dom"
 import useHeaderBackground from '../../hooks/hasHeaderBackground'
 import { closeSidebar, openSidebar, selectIsSidebarOpen } from "../../redux/slices/sidebarSlice"
 import { useDispatch, useSelector } from "react-redux"
+import { useEffect, useRef } from "react"
 
 const Header = () => {
 
@@ -20,6 +21,34 @@ const Header = () => {
   const dispatch = useDispatch()
   const isSidebarOpen = useSelector(selectIsSidebarOpen)
 
+  const navRef = useRef(null);
+
+  const handleNavClose = (event) => {
+    if(navRef?.current && !navRef.current.contains(event.target) && !isDescendantOf(event.target, 'sidebar-open-btn')){
+      dispatch(closeSidebar())
+    }
+  }
+
+  const isDescendantOf = (element, className) => {
+    let currentElement = element;
+    while(currentElement != null && !currentElement?.classList?.contains(className)){
+      currentElement = currentElement.parentNode;
+    }
+    return currentElement?.classList?.contains(className) ?? false;
+  }
+
+  useEffect(() => {
+    document.body.addEventListener('click', handleNavClose);
+    return() => {
+      document.body.removeEventListener('click', handleNavClose)
+    }
+  }, [])
+
+  //Fechar automáticamente quando clicar no link
+  const handleNavLinkClick = () => {
+    dispatch(closeSidebar())
+  }
+
   return (
     <HeaderWeapper className={`flex items-center ${headerStyle}`}>
       <Container className="w-full">
@@ -27,22 +56,22 @@ const Header = () => {
           <BrandWrapper to={routeConstants.HOME}>
             <img src={Images.Logo} alt="Logo do Site" />
           </BrandWrapper>
-          <NavWrapper className={`flex items-center justify-center ${isSidebarOpen ? "show" : ""}`}>
+          <NavWrapper ref={navRef} className={`flex items-center justify-center ${isSidebarOpen ? "show" : ""}`}>
             <button type="button" className="sidebar-close-btn" onClick={() => dispatch(closeSidebar())}>
               <img src={Icons.Close} alt="" />
             </button>
             <ul className="nav-list flex items-center justify-center bg-black06">
               <li className="nav-item">
-                <Link to={routeConstants.HOME} className={`nav-link inline-flex items-center justify-center text-center ${location.pathname === routeConstants.HOME ? "active" : ""}`}>Home</Link>
+                <Link onClick={handleNavLinkClick} to={routeConstants.HOME} className={`nav-link inline-flex items-center justify-center text-center ${location.pathname === routeConstants.HOME ? "active" : ""}`}>Home</Link>
               </li>
               <li className="nav-item">
-                <Link to={routeConstants.SHOWS} className={`nav-link inline-flex items-center justify-center text-center ${location.pathname === routeConstants.SHOWS ? "active" : ""}`}>Shows</Link>
+                <Link onClick={handleNavLinkClick} to={routeConstants.SHOWS} className={`nav-link inline-flex items-center justify-center text-center ${location.pathname === routeConstants.SHOWS ? "active" : ""}`}>Shows</Link>
               </li>
               <li className="nav-item">
-                <Link to="/support" className={`nav-link inline-flex items-center justify-center text-center ${location.pathname === '/support' ? "active" : ""}`}>Support</Link>
+                <Link onClick={handleNavLinkClick} to="/support" className={`nav-link inline-flex items-center justify-center text-center ${location.pathname === '/support' ? "active" : ""}`}>Support</Link>
               </li>
               <li className="nav-item">
-                <Link to="/subscription" className={`nav-link inline-flex items-center justify-center text-center ${location.pathname === '/subscription' ? "active" : ""}`}>Subscription</Link>
+                <Link onClick={handleNavLinkClick} to="/subscription" className={`nav-link inline-flex items-center justify-center text-center ${location.pathname === '/subscription' ? "active" : ""}`}>Subscription</Link>
               </li>
             </ul>
           </NavWrapper>
