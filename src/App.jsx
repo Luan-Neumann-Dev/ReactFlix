@@ -8,7 +8,7 @@ import routeConstants from './constant/routeConstants'
 import { BaseLayout } from './components'
 
 //Telas
-import { Home, Search, ShowDetail, Shows } from './screens'
+import { Home, PageNotFound, Search, ShowDetail, Shows } from './screens'
 
 //Separando as configurações de rotas
 const routes = [
@@ -33,6 +33,10 @@ const routes = [
         element: <Search />
       }
     ]
+  },
+  {
+    path: '*',
+    element: <PageNotFound/>
   }
 ]
 
